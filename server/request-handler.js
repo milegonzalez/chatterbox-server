@@ -1,16 +1,12 @@
 /*************************************************************
-
 You should implement your request handler function in this file.
-
 requestHandler is already getting passed to http.createServer()
 in basic-server.js, but it won't work as is.
-
 You'll have to figure out a way to export this function from
 this file and include it in basic-server.js so that it actually works.
-
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
-
 **************************************************************/
+var url = require('url');
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -24,6 +20,8 @@ var requestHandler = function(request, response) {
 
   // Do some basic logging.
   //
+  var paths = url.parse(require.url, true);
+  var room = "." + paths.pathname
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
@@ -71,3 +69,8 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
+//Export request handler
+
+var exports = module.exports = {};
+
+module.exports.requestHandler = requestHandler;
