@@ -2,6 +2,17 @@
 // Import requestHandler for use in createServer call
 var handleRequest = require('./request-handler.js');
 var http = require('http');
+var port = 3000;
+var ip = '127.0.0.1';
+
+var server = http.createServer((request, response) => {
+  handleRequest.requestHandler(request, response);
+});
+
+console.log('Listening on http://' + ip + ':' + port);
+server.listen(port, ip);
+
+
 
 // console.log("this is handleRequest: ", handleRequest);
 
@@ -10,12 +21,12 @@ var http = require('http');
 // normally already claimed by another server and/or not accessible
 // so we'll use a standard testing port like 3000, other common development
 // ports are 8080 and 1337.
-var port = 3000;
+
 
 // For now, since you're running this server on your local machine,
 // we'll have it listen on the IP address 127.0.0.1, which is a
 // special address that always refers to localhost.
-var ip = '127.0.0.1';
+
 
 // -----> this might not be doing anything.
 
@@ -31,15 +42,7 @@ var ip = '127.0.0.1';
 // After creating the server, we will tell it to listen on the given port and IP. */
 
 
-var server = http.createServer((request, response) => {
-  console.log('Milena', request);
-  handleRequest.requestHandler(request, response);
-});
 
-console.log('Listening on http://' + ip + ':' + port);
-// console.log('This is the server: ', server);
-// console.log('URL: ', URL);
-server.listen(port, ip);
 
 // To start this server, run:
 //

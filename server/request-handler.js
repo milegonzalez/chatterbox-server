@@ -9,34 +9,43 @@ this file and include it in basic-server.js so that it actually works.
 var url = require('url');
 
 var results = [];
-var requestHandler = function(request, response) {
+var requestHandler = function (request, response) {
   var headers = defaultCorsHeaders;
+  headers['Content-Type'] = 'application/json';
 
-  if (request.method === 'GET' && request.url === '/classes/messages'){
+  if (request.method === 'GET' && request.url === '/classes/messages') {
     response.writeHead(200, headers);
-    response.end(JSON.stringify({results: results}));
+    response.end(JSON.stringify({ results: results }));
   }
 
   if (request.method === 'GET' && request.url !== '/classes/messages') {
-     response.writeHead(404, 'sorry, not sure I understand what you\'re talking about');
-     response.end();
-   }
-
-
+    response.writeHead(404, 'sorry, not sure I understand what you\'re talking about');
+    response.end();
+  }
 
   if (request.method === 'POST' && request.url === '/classes/messages') {
-     let body = [];
-    request.on('error', (err) => {
-       console.error(err);
-    }).on('data', (chunk) => {
-       body.push(chunk);
-     }).on('end', () => {
-       body = Buffer.concat(body).toString();
-       results.push(body);
-     });
-     response.writeHead(201, headers);
-     response.end();
-   }
+    let body = [];
+    request.on('data', (chunk) => {
+      body = JSON.parse(chunk);
+      results.push(body);
+    });
+    response.writeHead(201, headers);
+    response.end(JSON.stringify({ results: results }));
+  }
+
+
+
+
+};
+
+var defaultCorsHeaders = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'access-control-allow-headers': 'content-type, accept',
+  'access-control-max-age': 10 // Seconds.
+};
+
+  module.exports.requestHandler = requestHandler;
 
   // Request and Response come from node's http module.
   //
@@ -47,9 +56,9 @@ var requestHandler = function(request, response) {
   // Documentation for both request and response can be found in the HTTP section at
   // http://nodejs.org/documentation/api/
 
-    // if (request.method === 'DELETE' && request.url === '/classes/messages'){
-    //   response.
-    // }
+  // if (request.method === 'DELETE' && request.url === '/classes/messages'){
+  //   response.
+  // }
   // Do some basic logging.
   //
   // var path = url.parse(request.url, true).pathname;
@@ -62,7 +71,6 @@ var requestHandler = function(request, response) {
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
-  console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   // The outgoing status.
   // var statusCode = 200;
@@ -73,7 +81,7 @@ var requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  // headers['Content-Type'] = 'text/plain';
+  //
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
@@ -86,8 +94,7 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  // response.end('Hello, World!');
-};
+
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
 // This code allows this server to talk to websites that
@@ -98,15 +105,22 @@ var requestHandler = function(request, response) {
 //
 // Another way to get around this restriction is to serve you chat
 // client from this domain by setting up static file serving.
-var defaultCorsHeaders = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
-  'access-control-max-age': 10 // Seconds.
-};
 
-//Export request handler
+// getting a deprecation Warning.
+  //   let body = [];
+  //   request.on('error', (err) => {
+  //     console.error(err);
+  //   }).on('data', (chunk) => {
+  //     body.push(chunk);
+  //   }).on('end', () => {
+  //     body = Buffer.concat(body).toString();
+  //     results.push(body);
+  //   });
+  //   response.writeHead(201, headers);
+  //   response.end();
+  // }
 
-// var exports = module.exports = {};
+  // console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
-module.exports.requestHandler = requestHandler;
+
+    // response.end('Hello, World!');
