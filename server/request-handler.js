@@ -8,7 +8,36 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var url = require('url');
 
+var results = [];
 var requestHandler = function(request, response) {
+  var headers = defaultCorsHeaders;
+
+  if (request.method === 'GET' && request.url === '/classes/messages'){
+    response.writeHead(200, headers);
+    response.end(JSON.stringify({results: results}));
+  }
+
+  if (request.method === 'GET' && request.url !== '/classes/messages') {
+     response.writeHead(404, 'sorry, not sure I understand what you\'re talking about');
+     response.end();
+   }
+
+
+
+  if (request.method === 'POST' && request.url === '/classes/messages') {
+     let body = [];
+    request.on('error', (err) => {
+       console.error(err);
+    }).on('data', (chunk) => {
+       body.push(chunk);
+     }).on('end', () => {
+       body = Buffer.concat(body).toString();
+       results.push(body);
+     });
+     response.writeHead(201, headers);
+     response.end();
+   }
+
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -18,30 +47,37 @@ var requestHandler = function(request, response) {
   // Documentation for both request and response can be found in the HTTP section at
   // http://nodejs.org/documentation/api/
 
+    // if (request.method === 'DELETE' && request.url === '/classes/messages'){
+    //   response.
+    // }
   // Do some basic logging.
   //
-  var paths = url.parse(require.url, true);
-  var room = "." + paths.pathname
+  // var path = url.parse(request.url, true).pathname;
+  // var room = "." + paths.pathname;
+
+  // if (require.url === '/classes/messages'){
+  //   console.log('hi there!')
+  // }
+
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   // The outgoing status.
-  var statusCode = 200;
+  // var statusCode = 200;
 
   // See the note below about CORS headers.
-  var headers = defaultCorsHeaders;
 
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'text/plain';
+  // headers['Content-Type'] = 'text/plain';
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+  // response.writeHead(statusCode, headers);
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -50,7 +86,7 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end('Hello, World!');
+  // response.end('Hello, World!');
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -71,6 +107,6 @@ var defaultCorsHeaders = {
 
 //Export request handler
 
-var exports = module.exports = {};
+// var exports = module.exports = {};
 
 module.exports.requestHandler = requestHandler;
