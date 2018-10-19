@@ -73,5 +73,25 @@ describe('server', function() {
     });
   });
 
+  // Test for options
+  it('should respond with messages that were previously posted', function(done) {
+    var requestParams = {method: 'OPTIONS',
+    };
 
+    request(requestParams, function(error, response, body) {
+      request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+        var messages = JSON.parse(body).results;
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+    });
+  });
+
+  it('Message should be a string', function(done) {
+    request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+      var parsedBody = JSON.parse(body).results;
+      expect(parsedBody[0].username).to.be.a('string');
+      done();
+    });
+  });
 });

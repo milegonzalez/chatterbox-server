@@ -1,41 +1,77 @@
-/*************************************************************
-You should implement your request handler function in this file.
-requestHandler is already getting passed to http.createServer()
-in basic-server.js, but it won't work as is.
-You'll have to figure out a way to export this function from
-this file and include it in basic-server.js so that it actually works.
-*Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
-**************************************************************/
 var url = require('url');
-
 var results = [];
-var requestHandler = function (request, response) {
+
+var requestHandler = function(request, response) {
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = 'application/json';
 
-  if (request.method === 'GET' && request.url === '/classes/messages') {
+
+  if (request.method === 'GET' && request.url === '/classes/messages'){
     response.writeHead(200, headers);
-    response.end(JSON.stringify({ results: results }));
-  }
-
-  if (request.method === 'GET' && request.url !== '/classes/messages') {
-    response.writeHead(404, 'sorry, not sure I understand what you\'re talking about');
+    // console.log(JSON.stringify({results: results}))
+    response.end(JSON.stringify({results: results}));
+  } else if (request.method === 'GET' && request.url !== '/classes/messages'){
+    response.writeHead(404, 'nope! sorry');
     response.end();
-  }
-
-  if (request.method === 'POST' && request.url === '/classes/messages') {
+  } else if (request.method === 'OPTIONS'){
+    headers['Content-Type'] = 'text/plain'
+    response.writeHead(200, headers);
+    response.end();
+  } else if (request.method === 'POST' && request.url === '/classes/messages') {
+    // this post request is working for the index.html section
     let body = [];
     request.on('data', (chunk) => {
-      body = JSON.parse(chunk);
-      results.push(body);
+      body.push(chunk)
+    }).on('end', () => {
+      results.push(JSON.parse(body));
+    }).on('error', () => {
+      response.writeHead(404, 'nope! sorry!');
     });
     response.writeHead(201, headers);
-    response.end(JSON.stringify({ results: results }));
+    response.end(JSON.stringify({results: results}));
+
+
+    // working code:
+    // let body = [];
+    // request.on('data', (chunk) => {
+    //   // body.push(chunk)
+    //   body = JSON.parse(chunk);
+    //   results.push(body);
+    //   response.writeHead(201, headers);
+    //   response.end(JSON.stringify({results: results}));
+    // // }).on('end', () => {
+    //   // results.push(JSON.parse(body));
+    //   // console.log('this isthe body before buffer', body)
+    //   // body = Buffer.concat(body).toString();
+    //   // console.log('this isthe body', body)
+    //   // results.push(body);
+    // }).on('error', () => {
+    //   response.writeHead(404, 'nope! sorry!');
+    // });
   }
 
-
-
-
+  // Edited code to work for refactor.html Not getting anything back.
+  // } else if (request.method === 'POST' && request.url === '/classes/messages') {
+  //   let body = [];
+  //   request.on('data', (chunk) => {
+  //     // body.push(chunk)
+  //     // body = JSON.parse(chunk);
+  //     // results.push(body);
+  //     // response.writeHead(201, headers);
+  //     response.end(JSON.stringify({results: results}));
+  //   }).on('end', () => {
+  //     // results.push(JSON.parse(body));
+  //     // console.log('this isthe body before buffer', body)
+  //     body = Buffer.concat(body).toString();
+  //     // console.log('this isthe body', body)
+  //     results.push(body);
+  //   }).on('error', () => {
+  //     response.writeHead(404, 'nope! sorry!');
+  //   });
+  //   // console.log('these are the results', results )
+  //   response.writeHead(201, headers);
+  //   // response.end(JSON.stringify({results: results}));
+  // }
 };
 
 var defaultCorsHeaders = {
@@ -45,12 +81,20 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
-  module.exports.requestHandler = requestHandler;
+module.exports.requestHandler = requestHandler;
 
-  // Request and Response come from node's http module.
-  //
-  // They include information about both the incoming request, such as
-  // headers and URL, and about the outgoing response, such as its status
+/*************************************************************
+You should implement your request handler function in this file.
+requestHandler is already getting passed to http.createServer()
+in basic-server.js, but it won't work as is.
+You'll have to figure out a way to export this function from
+this file and include it in basic-server.js so that it actually works.
+*Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
+**************************************************************/
+// Request and Response come from node's http module.
+//
+// They include information about both the incoming request, such as
+// headers and URL, and about the outgoing response, such as its status
   // and content.
   //
   // Documentation for both request and response can be found in the HTTP section at
@@ -107,18 +151,7 @@ var defaultCorsHeaders = {
 // client from this domain by setting up static file serving.
 
 // getting a deprecation Warning.
-  //   let body = [];
-  //   request.on('error', (err) => {
-  //     console.error(err);
-  //   }).on('data', (chunk) => {
-  //     body.push(chunk);
-  //   }).on('end', () => {
-  //     body = Buffer.concat(body).toString();
-  //     results.push(body);
-  //   });
-  //   response.writeHead(201, headers);
-  //   response.end();
-  // }
+
 
   // console.log('Serving request type ' + request.method + ' for url ' + request.url);
 

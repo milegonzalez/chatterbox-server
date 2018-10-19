@@ -10,7 +10,6 @@ describe('Node Server Request Listener Function', function() {
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
-
     expect(res._responseCode).to.equal(200);
     expect(res._ended).to.equal(true);
   });
@@ -100,6 +99,43 @@ describe('Node Server Request Listener Function', function() {
     handler.requestHandler(req, res);
 
     expect(res._responseCode).to.equal(404);
+    expect(res._ended).to.equal(true);
+  });
+
+  // it('Should throw an 201 when message is an array', function() {
+  //   var stubMsg = ['Jono', 'Do my bidding!', 'Lobby', '12345'];
+  //   var req = new stubs.request('/classes/messages', 'POST', stubMsg);
+  //   var res = new stubs.response();
+
+  //   handler.requestHandler(req, res);
+
+  //   expect(res._responseCode).to.equal(201);
+  //   expect(res._ended).to.equal(true);
+  // });
+
+  it('Should accept all information sent from POST to /classes/messages', function() {
+    var stubMsg = {
+      username: 'Jono',
+      text: 'Do my bidding!',
+      roomname: 'Lobby',
+      id: '12345'
+    };
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(201);
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should answer OPTIONS requests with 200 status code', function (){
+    var req = new stubs.request('/classes/messages', 'OPTIONS');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
     expect(res._ended).to.equal(true);
   });
 

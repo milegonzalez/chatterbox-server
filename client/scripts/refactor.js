@@ -75,11 +75,15 @@ app = {
 
   loadMsgs: function() {
     $.ajax({
+      type: 'GET',
       url: app.server,
+      // data: JSON.stringify(data),
       data: { order: '-createdAt' },
       contentType: 'application/json',
       success: function(json) {
+        console.log(json.results, 'this is json.results', json, 'this is json')
         app.displayMessages(json.results);
+        // app.displayMessages(JSON.stringify(data));
       },
       complete: function() {
         app.stopSpinner();
@@ -92,7 +96,7 @@ app = {
     $.ajax({
       type: 'POST',
       url: app.server,
-      data: message,
+      data: JSON.stringify(message),
       contentType: 'application/json',
       success: function(json) {
         message.objectId = json.objectId;
@@ -121,7 +125,7 @@ app = {
 /////////////////////////////////////////////////////////////////////////////
 
 var Message = Backbone.Model.extend({
-  url: 'https://api.parse.com/1/classes/messages/',
+  url: 'http://127.0.0.1:3000/classes/messages',
   defaults: {
     username: '',
     text: ''
@@ -131,10 +135,11 @@ var Message = Backbone.Model.extend({
 var Messages = Backbone.Collection.extend({
 
   model: Message,
-  url: 'https://api.parse.com/1/classes/messages/',
+  url: 'http://127.0.0.1:3000/classes/messages',
 
   loadMsgs: function() {
     this.fetch({data: { order: '-createdAt' }});
+    // this.fetch();
   },
 
   parse: function(response, options) {
